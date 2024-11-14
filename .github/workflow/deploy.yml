@@ -1,0 +1,14 @@
+deploy:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@v0.1.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/nginx-hello:latest
+          docker stop nginx-hello || true
+          docker rm nginx-hello || true
+          docker run -d -p 80:80 --name nginx-hello ${{ secrets.DOCKER_HUB_USERNAME }}/nginx-hello:latest
